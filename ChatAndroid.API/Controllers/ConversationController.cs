@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using ChatAndroid.API.Data;
 using ChatAndroid.API.Data.InputModels;
@@ -21,32 +22,32 @@ namespace ChatAndroid.API.Controllers
             _db = db;
         }
         
-        [ HttpGet ]
-        [ Route("") ]
+        [ HttpGet("") ]
         public IActionResult GetConversations()
         {
             return Ok(_db.Conversations.Select(ConversationListViewMapping.MapConversationViewModel()));
         }
 
-        [ HttpGet ]
-        [ Route("{id}") ]
-        public async Task<IActionResult> GetMessage(int id)
+        [ HttpGet("{id}") ]
+        public async Task<IActionResult> GetConversation(int id)
         {
-            var conversation = await _db.Conversations.Include(c => c.Messages)
-                                                      .Select(ConversationViewMapping.MapConversationViewModel())
+            var conversation = await _db.Conversations.Include(m => m.Messages)
+                                                      .ThenInclude(m => m.User)
+                                                      //.Select(ConversationViewMapping.MapConversationViewModel())
                                                       .SingleOrDefaultAsync(c => c.ConversationId == id);
 
             if (conversation == null)
             {
                 return NotFound();
             }
+
+            var conversationView = ConversationViewMapping.MapConversationViewModel().Compile().Invoke(conversation);
             
-            return Ok(conversation);
+            return Ok(conversationView);
         }
         
-        [ HttpPost ]
-        [ Route("") ]
-        public async Task<IActionResult> AddMessage([FromBody] ConversationInputModel conversation)
+        [ HttpPost("") ]
+        public async Task<IActionResult> AddConversation([FromBody] ConversationInputModel conversation)
         {
             var newConversation = new Conversation
             {
@@ -56,6 +57,35 @@ namespace ChatAndroid.API.Controllers
             await _db.Conversations.AddAsync(newConversation);
             await _db.SaveChangesAsync();
             return Ok(newConversation);
+        }
+        
+        [ HttpPost("{id}/message") ]
+        public async Task<IActionResult> AddMessage([FromBody] MessageInputModel message, int id)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var conversation =
+                await _db.Conversations.SingleOrDefaultAsync(x => x.ConversationId == id);
+                
+            if (conversation == null)
+            {
+                ModelState.AddModelError("MissingConversation", "There is no conversation with this ID");
+                return BadRequest(ModelState);
+            }
+            
+            var newMessage = new Message
+            {
+                ConversationId = id,
+                Contenu = message.Contenu,
+                
+                UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+            };
+
+            await _db.Messages.AddAsync(newMessage);
+            await _db.SaveChangesAsync();
+            
+            return Ok();
         }
     }
 }

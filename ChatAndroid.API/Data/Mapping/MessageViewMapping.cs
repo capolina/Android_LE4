@@ -12,9 +12,8 @@ namespace ChatAndroid.API.Data.Mapping
             return m => new MessageViewModel
             {
                 Contenu        = m.Contenu,
-                ConversationId = m.ConversationId,
                 MessageId      = m.MessageId,
-                UserId         = m.UserId
+                UserName       = m.User.UserName
             };
         }
     }

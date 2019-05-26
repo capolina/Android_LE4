@@ -30,11 +30,11 @@ namespace ChatAndroid.API.Controllers
             _jwtOptions    = jwtOptions.Value;
         }
         
-        [ HttpGet("") ]
+        /*[ HttpGet("") ]
         public IActionResult GetConversations()
         {
             return Ok(_userManager.Users);
-        }
+        }*/
         
         [ HttpPost("login") ]
         public async Task<IActionResult> Login([FromBody] LoginInputModel user)
@@ -54,84 +54,37 @@ namespace ChatAndroid.API.Controllers
             return BadRequest(ModelState);
         }
         
-        [ HttpPost("") ]
-        public async Task<IActionResult> AddUser([FromBody] User user)
+        [ HttpPost("register") ]
+        public async Task<IActionResult> Register([FromBody] RegisterInputModel user)
         {
-            var nuser = new User();
-            nuser.UserName = "Coco";
-            await _userManager.CreateAsync(nuser, "Admin1!!");
-            return Ok(nuser);
-        }
-        
-        /*[ HttpPost ]
-        [ Authorize(Roles = Roles.Admin) ]
-        [ Route("") ]
-        public async Task<IActionResult> CreateUser([ FromBody ] PetlandUser model)
-        {
-            try
+            IdentityResult result;
+            if (!ModelState.IsValid)
             {
-                IdentityResult result;
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-
-                model.PhoneNumber = FormatPhoneNumber(model.PhoneNumber);
-                
-                if (await _userManager.Users.CountAsync(x => x.PhoneNumber == model.PhoneNumber) != 0)
-                {
-                    ModelState.AddModelError("duplicatePhoneNumber", $@"Phone number '{model.PhoneNumber}' is already taken.");
-                    return BadRequest(ModelState);
-                }
-                
-                var user = new PetlandUser
-                           {
-                               FirstName   = model.FirstName,
-                               LastName    = model.LastName,
-                               UserName    = model.UserName,
-                               PhoneNumber = model.PhoneNumber,
-                               Email       = model.Email,
-                               Address1    = model.Address1,
-                               Address2    = model.Address2,
-                               City        = model.City,
-                               State       = model.State,
-                               Zip         = model.Zip,
-                               Country     = model.Country
-                           };
-
-                var password = model.Password != "" ? model.Password : GenerateRandomPassword();
-
-                result = await _userManager.CreateAsync(user, password);
-
-                if (result.Succeeded)
-                {
-                    result = await _userManager.AddToRoleAsync(user, Roles.Customer);
-                    if (result.Succeeded)
-                    {
-                        if (model.IsAdmin)
-                        {
-                            result = await _userManager.AddToRoleAsync(user, Roles.Admin);
-                        }
-
-                        if (result.Succeeded)
-                        {
-                            return Ok();
-                        }
-                    }
-                }
-
-                foreach (var error in result.Errors)
-                    ModelState.AddModelError(error.Code, error.Description);
-
                 return BadRequest(ModelState);
             }
-            catch (Exception ex)
+
+            var newuser = new User
             {
-                Logger.Error(ex, "Failure while creating new user.");
-                return StatusCode(500);
+                UserName = user.Username,
+                Admin = false,
+                Blacklist = false,
+                Connecte = false,
+                Couleur = "Black"
+            
+            };
+            result = await _userManager.CreateAsync(newuser, user.Password);
+
+            if (result.Succeeded)
+            {
+                return Ok();
             }
-        }*/
+
+            foreach (var error in result.Errors)
+                ModelState.AddModelError(error.Code, error.Description);
+
+            return BadRequest(ModelState);
+        }
+        
         private async Task<string> GenerateJwtToken(string username, User user)
         {
             var claims = new List<Claim>
