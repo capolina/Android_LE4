@@ -63,6 +63,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 // TODO: Vérifier la connexion ("connecte":true)
                 try {
                     if (result.getBoolean("connecte")) {
+                        LoginActivity.this.savePrefs();
                         // TODO: Changer d'activité vers choixConversation
                         Intent toChoixConv = new Intent(LoginActivity.this,ChoixConvActivity.class);
                         startActivity(toChoixConv);
@@ -125,6 +126,24 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     }
 
+    private void savePrefs() {
+        SharedPreferences settings =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.clear();
+
+        if (champRemember.isChecked()) {
+            editor.putBoolean("remember", true);
+            editor.putString("login", champLogin.getText().toString());
+            editor.putString("passe", champPass.getText().toString());
+        } else {
+            editor.putBoolean("remember", false);
+            editor.putString("login", "");
+            editor.putString("passe", "");
+        }
+        editor.commit();
+    }
+
 
 
     @Override
@@ -137,10 +156,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings : gs.alerter("preferences");
-                // afficher l'activité "préférences"
+            // afficher l'activité "préférences"
                 Intent toSettings = new Intent(this,SettingsActivity.class);
                 startActivity(toSettings);
-                break ;
+            break ;
             case R.id.action_account : gs.alerter("compte"); break ;
 
         }
@@ -151,23 +170,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.login_cbRemember : // Clic sur case à cocher
-
-                SharedPreferences settings =
-                        PreferenceManager.getDefaultSharedPreferences(this);
-                SharedPreferences.Editor editor = settings.edit();
-                editor.clear();
-
-                CheckBox cb = (CheckBox) v;
-                if (cb.isChecked()) {
-                    editor.putBoolean("remember", true);
-                    editor.putString("login", champLogin.getText().toString());
-                    editor.putString("passe", champPass.getText().toString());
-                } else {
-                    editor.putBoolean("remember", false);
-                    editor.putString("login", "");
-                    editor.putString("passe", "");
-                }
-                editor.commit();
+                savePrefs();
 
                 break;
 
