@@ -1,74 +1,79 @@
 package com.example.chat;
 
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Spinner;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ChoixConvActivity extends AppCompatActivity {
+public class ChoixConvActivity extends RestActivity {
 
-    GlobalState gs;
+    private ListeConversations listeConvs;
 
-    class JSONAsyncTask extends AsyncTask<String, Void, JSONObject> {
-        // Params, Progress, Result
+    @Override
+    public void traiteReponse(JSONObject o, String action){
+        if (action == "recupConversations") {
+            gs.alerter(o.toString());
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            Log.i("L4-SI-Logs","onPreExecute");
-        }
+            // On transforme notre objet JSON en une liste de "Conversations"
+            // On pourrait utiliser la librairie GSON pour automatiser ce processus d'interprétation
+            // des objets JSON reçus
+            // Cf. poly de centrale "programmation mobile et réalité augmentée"
 
-        @Override
-        protected JSONObject doInBackground(String... qs) {
-            // String... qs est une ellipse:
-            // permet de récupérer des arguments passés sous forme de liste arg1, arg2, arg3...
-            // dans un tableau
-            // pas d'interaction avec l'UI Thread ici
-            Log.i("L4-SI-Logs","doInBackground");
-            String res = ChoixConvActivity.this.gs.requete(qs[0]);
+            // Ici, on se contente de créer une classe "Conversation" et une classe "ListeConversations"
+            // On parcourt l’objet JSON pour instancier des Conversations, que l’on insère dans la liste
 
-            JSONObject ob = null;
+            /*
+             * {"connecte":true,
+             * "action":"getConversations",
+             * "feedback":"entrez action: logout, setPasse(passe),setPseudo(pseudo), setCouleur(couleur),getConversations, getMessages(idConv,[idLastMessage]), setMessage(idConv,contenu), ...",
+             * "conversations":[ {"id":"12","active":"1","theme":"Les cours en IAM"},
+             *                   {"id":"2","active":"1","theme":"Ballon d'Or"}]}
+             * */
+
+            int i;
+            JSONArray convs = null;
             try {
-                // TODO: interpréter le résultat sous forme d'objet JSON
-                ob = new JSONObject(res);
+                convs = o.getJSONArray("conversations");
+                for(i=0;i<convs.length();i++) {
+                    JSONObject nextConv = (JSONObject) convs.get(i);
+
+                    int id =Integer.parseInt(nextConv.getString("id"));
+                    String theme = nextConv.getString("theme");
+                    Boolean active = ((String) nextConv.getString("active")).contentEquals("1");
+
+                    gs.alerter("Conv " + id  + " theme = " + theme + " active ?" + active);
+                    Conversation c = new Conversation(id, theme, active);
+
+                    listeConvs.addConversation(c);
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            return ob; // TODO: renvoyer des JSONObject et pas des String
-        }
+            gs.alerter(listeConvs.toString());
 
-        protected void onPostExecute(JSONObject result) {
-            Log.i("L4-SI-Logs","onPostExecute");
-            if (result != null ) {
-                Log.i("L4-SI-Logs", result.toString());
-                ChoixConvActivity.this.gs.alerter(result.toString());
-
-                // TODO: Vérifier la connexion ("connecte":true)
-                try {
-                    if (result.getBoolean("connecte")) {
-                        // TODO: Changer d'activité vers choixConversation
-
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choix_conversation);
-        gs = (GlobalState) getApplication();
 
+        listeConvs = new ListeConversations();
+
+        //Au démarrage de l'activité, réalirer une requete
+        //Pour récupérer les conversations
         String qs = "action=getConversations";
-        JSONAsyncTask js = new JSONAsyncTask();
-        js.execute(qs);
+
+        //On se sert des services offerts par RestActivity
+        //qui propose des méthodes d'envoi des requetes asynchrones
+        envoiRequete(qs, "recupConversations");
     }
 }
