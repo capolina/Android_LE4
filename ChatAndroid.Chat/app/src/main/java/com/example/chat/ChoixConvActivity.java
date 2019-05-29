@@ -1,18 +1,16 @@
 package com.example.chat;
 
 import android.content.Context;
-import android.os.AsyncTask;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,13 +18,15 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class ChoixConvActivity extends RestActivity {
+public class ChoixConvActivity extends RestActivity implements View.OnClickListener {
 
     private ListeConversations listeConvs;
+    private Button btnOK;
+    private Spinner sp;
 
     @Override
-    public void traiteReponse(JSONObject o, String action){
-        if (action == "recupConversations") {
+    public void traiteReponse(JSONObject o, String action) {
+        if (action.contentEquals("recupConversations")) {
             gs.alerter(o.toString());
 
             // On transforme notre objet JSON en une liste de "Conversations"
@@ -46,7 +46,7 @@ public class ChoixConvActivity extends RestActivity {
              * */
 
             int i;
-            JSONArray convs;
+            JSONArray convs = null;
             try {
                 convs = o.getJSONArray("conversations");
                 for(i=0;i<convs.length();i++) {
@@ -54,20 +54,22 @@ public class ChoixConvActivity extends RestActivity {
 
                     int id =Integer.parseInt(nextConv.getString("id"));
                     String theme = nextConv.getString("theme");
-                    Boolean active = (nextConv.getString("active")).contentEquals("1");
+                    Boolean active = ((String) nextConv.getString("active")).contentEquals("1");
 
                     gs.alerter("Conv " + id  + " theme = " + theme + " active ?" + active);
-                    Conversation c = new Conversation(id, theme, active);
+                    Conversation c = new Conversation(id,theme,active);
 
                     listeConvs.addConversation(c);
                 }
-                remplirSpinner();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
             gs.alerter(listeConvs.toString());
 
+            // On peut maintenant appuyer sur le bouton
+            btnOK.setEnabled(true);
+            remplirSpinner();
         }
     }
 
@@ -76,15 +78,21 @@ public class ChoixConvActivity extends RestActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choix_conversation);
 
-        listeConvs = new ListeConversations();
-
-        //Au démarrage de l'activité, réalirer une requete
-        //Pour récupérer les conversations
+        // Au démarrage de l'activité, réaliser une requete
+        // Pour récupérer les conversations
         String qs = "action=getConversations";
 
-        //On se sert des services offerts par RestActivity
-        //qui propose des méthodes d'envoi des requetes asynchrones
+        // On se sert des services offerts par RestActivity,
+        // qui propose des méthodes d'envoi de requetes asynchrones
         envoiRequete(qs, "recupConversations");
+
+        listeConvs = new ListeConversations();
+
+        btnOK = findViewById(R.id.choixConversation_btnOK);
+        btnOK.setOnClickListener(this);
+
+        sp = (Spinner) findViewById(R.id.choixConversation_choixConv);
+
     }
 
     private void remplirSpinner() {
@@ -97,6 +105,28 @@ public class ChoixConvActivity extends RestActivity {
         sp.setAdapter(new MyCustomAdapter(this,
                 R.layout.spinner_item,
                 listeConvs.getList()));
+    }
+
+    @Override
+    public void onClick(View v) {
+        // lors du clic sur le bouton OK,
+        // récupérer l'id de la conversation sélectionnée
+        // démarrer l'activité d'affichage des messages
+
+        // NB : il faudrait être sur qu'on ne clique pas sur le bouton
+        // tant qu'on a pas fini de charger la liste des conversations
+        // On indique que le bouton est désactivé au départ.
+
+        Conversation convSelected = (Conversation) sp.getSelectedItem();
+        gs.alerter("Conv sélectionnée : " + convSelected.getTheme()
+                + " id=" + convSelected.getId());
+
+        // On crée un Intent pour changer d'activité
+        Intent toShowConv = new Intent(this, ShowConvActivity.class);
+        Bundle bdl = new Bundle();
+        bdl.putInt("idConversation",convSelected.getId());
+        toShowConv.putExtras(bdl);
+        startActivity(toShowConv);
     }
 
     public class MyCustomAdapter extends ArrayAdapter<Conversation> {
