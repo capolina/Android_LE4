@@ -2,7 +2,6 @@ package com.example.chat;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,12 +12,10 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+public class LoginActivity extends RestActivity implements View.OnClickListener {
 
     EditText champLogin;
     EditText champPass;
@@ -26,53 +23,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     GlobalState gs;
     Button btnOK;
 
-    class JSONAsyncTask extends AsyncTask<String, Void, JSONObject> {
-        // Params, Progress, Result
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            Log.i("L4-SI-Logs","onPreExecute");
-        }
-
-        @Override
-        protected JSONObject doInBackground(String... qs) {
-            // String... qs est une ellipse:
-            // permet de récupérer des arguments passés sous forme de liste arg1, arg2, arg3...
-            // dans un tableau
-            // pas d'interaction avec l'UI Thread ici
-            Log.i("L4-SI-Logs","doInBackground");
-            String res = LoginActivity.this.gs.requete(qs[0]);
-
-            JSONObject ob = null;
-            try {
-                // TODO: interpréter le résultat sous forme d'objet JSON
-                ob = new JSONObject(res);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return ob; // TODO: renvoyer des JSONObject et pas des String
-        }
-
-        protected void onPostExecute(JSONObject result) {
-            Log.i("L4-SI-Logs","onPostExecute");
+    @Override
+    public void traiteReponse(JSONObject result, String action) {
+        if (action.contentEquals("connexion")) {
             if (result != null ) {
-                Log.i("L4-SI-Logs", result.toString());
-                LoginActivity.this.gs.alerter(result.toString());
-
-                // TODO: Vérifier la connexion ("connecte":true)
-                try {
-                    if (result.getBoolean("connecte")) {
-                        LoginActivity.this.savePrefs();
-                        // TODO: Changer d'activité vers choixConversation
-                        Intent toChoixConv = new Intent(LoginActivity.this,ChoixConvActivity.class);
-                        startActivity(toChoixConv);
-
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                login(result);
             }
         }
     }
@@ -125,6 +80,28 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             champRemember.setChecked(true);
         }
 
+    }
+
+    private void login(JSONObject result) {
+        Log.i("L4-SI-Logs", result.toString());
+        //LoginActivity.this.gs.alerter(result.toString());
+
+        // TODO: Vérifier la connexion ("connecte":true)
+        try {
+            if (result.getBoolean("connecte")) {
+                LoginActivity.this.gs.alerter("Connexion réussie");
+                LoginActivity.this.savePrefs();
+                // TODO: Changer d'activité vers choixConversation
+                Intent toChoixConv = new Intent(LoginActivity.this,ChoixConvActivity.class);
+                startActivity(toChoixConv);
+
+            }
+            else {
+                LoginActivity.this.gs.alerter("Connexion échouée");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void savePrefs() {
@@ -183,12 +160,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                 String qs = "action=connexion&login=" + login + "&passe=" +passe;
 
-                // gs.requete(qs); // Ceci génère une exception : networkOnMainThread
-
-                // A faire en utilisant une AsyncTask
-                JSONAsyncTask js = new JSONAsyncTask();
-                js.execute(qs);
-
+                // On se sert des services offerts par RestActivity,
+                // qui propose des méthodes d'envoi de requetes asynchrones
+                envoiRequete(qs, "connexion");
 
                 break;
 

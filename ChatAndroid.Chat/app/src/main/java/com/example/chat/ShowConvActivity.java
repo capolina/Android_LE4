@@ -29,43 +29,8 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
         if (action.contentEquals("chargement_messages")) {
             // On a reçu des messages
             // gs.alerter(o.toString());
-           /* {"connecte":true,
-            "action":"getMessages",
-            "feedback":"entrez action: logout, setPasse(passe),setPseudo(pseudo),
-            setCouleur(couleur),getConversations,
-            getMessages(idConv,[idLastMessage]),
-            setMessage(idConv,contenu), ...",
-            "messages":[{"id":"35",
-                            "contenu":"Que pensez-vous des cours en IAM ?",
-                            "auteur":"Tom",
-                            "couleur":"#ff0000"}]
-            ,"idLastMessage":"35"}
-            */
 
-            try {
-
-                // parcours des messages
-                JSONArray messages = o.getJSONArray("messages");
-                int i;
-                for(i=0;i<messages.length();i++) {
-                    JSONObject msg = (JSONObject) messages.get(i);
-                    String contenu =  msg.getString("contenu");
-                    String auteur =  msg.getString("auteur");
-                    String couleur =  msg.getString("couleur");
-
-                    TextView tv = new TextView(this);
-                    tv.setText("[" + auteur + "] " + contenu);
-                    tv.setTextColor(Color.parseColor(couleur));
-
-                    msgLayout.addView(tv);
-
-                }
-
-                // mise à jour du numéro du dernier message
-                idLastMessage = Integer.parseInt(o.getString("idLastMessage"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            loadMessages(o);
         }
 
     }
@@ -94,6 +59,34 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
         btnOK.setOnClickListener(this);
 
         edtMsg = findViewById(R.id.conversation_edtMessage);
+    }
+
+    private void loadMessages(JSONObject o) {
+        try {
+            // parcours des messages
+            JSONArray messages = o.getJSONArray("messages");
+            int i;
+            for(i=0;i<messages.length();i++) {
+                addMessage((JSONObject) messages.get(i));
+            }
+
+            // mise à jour du numéro du dernier message
+            idLastMessage = Integer.parseInt(o.getString("idLastMessage"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addMessage(JSONObject msg) throws JSONException {
+        String contenu =  msg.getString("contenu");
+        String auteur =  msg.getString("auteur");
+        String couleur =  msg.getString("couleur");
+
+        TextView tv = new TextView(this);
+        tv.setText("[" + auteur + "] " + contenu);
+        tv.setTextColor(Color.parseColor(couleur));
+
+        msgLayout.addView(tv);
     }
 
     public String urlPeriodique(String action) {

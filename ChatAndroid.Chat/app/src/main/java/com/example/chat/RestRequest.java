@@ -4,7 +4,6 @@ package com.example.chat;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
