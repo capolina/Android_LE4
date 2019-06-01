@@ -133,28 +133,6 @@ public class LoginActivity extends RestActivity implements View.OnClickListener 
         editor.commit();
     }
 
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings : gs.alerter("preferences");
-            // afficher l'activité "préférences"
-                Intent toSettings = new Intent(this,SettingsActivity.class);
-                startActivity(toSettings);
-            break ;
-            case R.id.action_account : gs.alerter("compte"); break ;
-
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {

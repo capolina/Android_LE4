@@ -89,8 +89,6 @@ public abstract class RestActivity extends AppCompatActivity {
         gs = (GlobalState) getApplication();
     }
 
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
@@ -103,8 +101,8 @@ public abstract class RestActivity extends AppCompatActivity {
         switch(id) {
             case R.id.action_account : gs.alerter("Non implementé"); break;
             case R.id.action_settings :
-                Intent versPrefs = new Intent(this,PrefsActivity.class);
-                startActivity(versPrefs);
+                Intent versSettings = new Intent(this, SettingsActivity.class);
+                startActivity(versSettings);
                 break;
         }
         return super.onOptionsItemSelected(item);
