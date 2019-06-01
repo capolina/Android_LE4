@@ -12,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.android.volley.Response;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,13 +27,6 @@ public class ChoixConvActivity extends RestActivity implements View.OnClickListe
     private Spinner sp;
 
     @Override
-    public void traiteReponse(JSONObject o, String action) {
-        if (action.contentEquals("recupConversations")) {
-            chargerConvs(o);
-        }
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choix_conversation);
@@ -42,7 +37,7 @@ public class ChoixConvActivity extends RestActivity implements View.OnClickListe
 
         // On se sert des services offerts par RestActivity,
         // qui propose des méthodes d'envoi de requetes asynchrones
-        //envoiRequete(qs, "recupConversations");
+        envoiRequete(qs, loadConversationsCallBack());
 
         listeConvs = new ListeConversations();
 
@@ -97,6 +92,19 @@ public class ChoixConvActivity extends RestActivity implements View.OnClickListe
         // On peut maintenant appuyer sur le bouton
         btnOK.setEnabled(true);
         remplirSpinner();
+    }
+
+    private Response.Listener<JSONObject> loadConversationsCallBack() {
+        return new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject result) {
+                // On a reçu des messages
+                // gs.alerter(o.toString());
+
+                chargerConvs(result);
+            }
+        };
     }
 
     private void remplirSpinner() {
