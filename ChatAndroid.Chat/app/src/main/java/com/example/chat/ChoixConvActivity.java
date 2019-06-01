@@ -42,7 +42,7 @@ public class ChoixConvActivity extends RestActivity implements View.OnClickListe
 
         // On se sert des services offerts par RestActivity,
         // qui propose des méthodes d'envoi de requetes asynchrones
-        envoiRequete(qs, "recupConversations");
+        //envoiRequete(qs, "recupConversations");
 
         listeConvs = new ListeConversations();
 

@@ -52,7 +52,7 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
         // qui permet d'indiquer le dernier message dont on dispose
         // action=getMessages&idConv=<ID>&idLastMessage=<NUMERO>
 
-        requetePeriodique(10, "chargement_messages");
+        //requetePeriodique(10, "chargement_messages");
         msgLayout = findViewById(R.id.conversation_svLayoutMessages);
 
         btnOK = findViewById(R.id.conversation_btnOK);
@@ -89,12 +89,11 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
         msgLayout.addView(tv);
     }
 
-    public String urlPeriodique(String action) {
+    public String urlPeriodique() {
         String qs = "";
-        if (action.equals("chargement_messages")) {
-            qs = "action=getMessages&idConv=" + idConv;
-            qs += "&idLastMessage=" + idLastMessage;
-        }
+
+        qs = "action=getMessages&idConv=" + idConv;
+        qs += "&idLastMessage=" + idLastMessage;
 
         return qs;
     }
@@ -107,7 +106,7 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
         String msg = edtMsg.getText().toString();
         String qs="action=setMessage&idConv=" + idConv +"&contenu=" + msg;
 
-        envoiRequete(qs,"posterMessage");
+        //envoiRequete(qs,"posterMessage");
 
         edtMsg.setText("");
     }

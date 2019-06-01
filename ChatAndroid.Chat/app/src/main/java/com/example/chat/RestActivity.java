@@ -12,6 +12,10 @@ import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.toolbox.JsonObjectRequest;
+
 
 public abstract class RestActivity extends AppCompatActivity {
 
@@ -22,14 +26,19 @@ public abstract class RestActivity extends AppCompatActivity {
     // comment faire pour controler quelle requete se termine ?
     // on passe une seconde chaine à l'appel asynchrone
 
-    public void envoiRequete(String qs, String action) {
-        // En instanciant à chaque fois, on peut faire autant de requetes que l'on veut...
+    public void envoiRequete(String qs, Response.Listener<JSONObject> onResponse, Response.ErrorListener onErrorResponse) {
+        String url = gs.getUrl(qs);
 
-        RestRequest req = new RestRequest(this);
-        req.execute(qs,action);
+        gs.alerter(url);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, onResponse, onErrorResponse);
+
+        // Access the RequestQueue through your singleton class.
+        RequestQueueSingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
-    public String urlPeriodique(String action) {
+    public String urlPeriodique() {
         // devrait être abstraite, mais dans ce cas doit être obligatoirement implémentée...
         // On pourrait utiliser une interface ?
         return "";
@@ -39,7 +48,7 @@ public abstract class RestActivity extends AppCompatActivity {
     // Try AlarmManager running Service
     // http://rmdiscala.developpez.com/cours/LesChapitres.html/Java/Cours3/Chap3.1.htm
     // La requete elle-même sera récupérée grace à l'action demandée dans la méthode urlPeriodique
-    public void requetePeriodique(int periode, final String action) {
+    public void requetePeriodique(int periode, final Response.Listener<JSONObject> onResponse, final Response.ErrorListener onErrorResponse) {
 
         TimerTask doAsynchronousTask;
         final Handler handler = new Handler();
@@ -52,7 +61,7 @@ public abstract class RestActivity extends AppCompatActivity {
 
                 handler.post(new Runnable() {
                     public void run() {
-                        envoiRequete(urlPeriodique(action),action);
+                        envoiRequete(urlPeriodique(), onResponse, onErrorResponse);
                     }
                 });
 

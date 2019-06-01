@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -35,8 +36,6 @@ public class GlobalState extends Application {
         t.show();
     }
 
-
-
     private String convertStreamToString(InputStream in) throws IOException {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -55,7 +54,20 @@ public class GlobalState extends Application {
         }
     }
 
+    public String getUrl(String qs) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String urlData = prefs.getString("urlData","http://10.0.2.2/android_chat/data.php");
 
+        try {
+            URL url = new URL(urlData + "?" + qs);
+
+            return url.toString();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
 
     public String requete(String qs) {
         if (qs != null)
@@ -83,7 +95,6 @@ public class GlobalState extends Application {
 
         return "";
     }
-
 
     public boolean verifReseau()
     {
