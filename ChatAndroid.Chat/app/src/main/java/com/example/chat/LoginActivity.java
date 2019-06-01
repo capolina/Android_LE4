@@ -27,15 +27,6 @@ public class LoginActivity extends RestActivity implements View.OnClickListener 
     Button btnOK;
 
     @Override
-    public void traiteReponse(JSONObject result, String action) {
-        if (action.contentEquals("connexion")) {
-            if (result != null ) {
-                //login(result);
-            }
-        }
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         gs = (GlobalState) getApplication();
@@ -93,7 +84,7 @@ public class LoginActivity extends RestActivity implements View.OnClickListener 
 
         // On se sert des services offerts par RestActivity,
         // qui propose des méthodes d'envoi de requetes asynchrones
-        envoiRequete(qs, login(), this.printError());
+        envoiRequete(qs, login());
     }
 
     private Response.Listener<JSONObject> login() {
@@ -120,17 +111,6 @@ public class LoginActivity extends RestActivity implements View.OnClickListener 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            }
-        };
-    }
-
-    private Response.ErrorListener printError() {
-        return new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                gs.alerter("Error");
-
             }
         };
     }

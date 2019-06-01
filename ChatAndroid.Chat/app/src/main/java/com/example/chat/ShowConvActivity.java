@@ -8,6 +8,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.android.volley.Response;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,20 +22,6 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
     private LinearLayout msgLayout;
     private Button btnOK;
     private EditText edtMsg;
-
-    @Override
-    public void traiteReponse(JSONObject o, String action) {
-        if (action.contentEquals("posterMessage")) {
-            gs.alerter("retour de la requete posterMessage");
-        }
-        if (action.contentEquals("chargement_messages")) {
-            // On a reçu des messages
-            // gs.alerter(o.toString());
-
-            loadMessages(o);
-        }
-
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +40,7 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
         // qui permet d'indiquer le dernier message dont on dispose
         // action=getMessages&idConv=<ID>&idLastMessage=<NUMERO>
 
-        //requetePeriodique(10, "chargement_messages");
+        requetePeriodique(10, loadMessageCallBack());
         msgLayout = findViewById(R.id.conversation_svLayoutMessages);
 
         btnOK = findViewById(R.id.conversation_btnOK);
@@ -89,6 +77,29 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
         msgLayout.addView(tv);
     }
 
+    private Response.Listener<JSONObject> postMessageCallBack() {
+        return new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject result) {
+                gs.alerter("Message posté");
+            }
+        };
+    }
+
+    private Response.Listener<JSONObject> loadMessageCallBack() {
+        return new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject result) {
+                // On a reçu des messages
+                // gs.alerter(o.toString());
+
+                loadMessages(result);
+            }
+        };
+    }
+
     public String urlPeriodique() {
         String qs = "";
 
@@ -106,7 +117,7 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
         String msg = edtMsg.getText().toString();
         String qs="action=setMessage&idConv=" + idConv +"&contenu=" + msg;
 
-        //envoiRequete(qs,"posterMessage");
+        envoiRequete(qs, postMessageCallBack());
 
         edtMsg.setText("");
     }

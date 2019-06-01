@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 
@@ -36,6 +37,10 @@ public abstract class RestActivity extends AppCompatActivity {
 
         // Access the RequestQueue through your singleton class.
         RequestQueueSingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+    }
+
+    public void envoiRequete(String qs, Response.Listener<JSONObject> onResponse) {
+        envoiRequete(qs, onResponse, printError());
     }
 
     public String urlPeriodique() {
@@ -73,10 +78,9 @@ public abstract class RestActivity extends AppCompatActivity {
 
     }
 
-
-
-    public abstract void traiteReponse(JSONObject o, String action);
-    // devra être implémenté dans la classe fille
+    public void requetePeriodique(int periode, final Response.Listener<JSONObject> onResponse) {
+        requetePeriodique(periode, onResponse, printError());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +110,15 @@ public abstract class RestActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private Response.ErrorListener printError() {
+        return new Response.ErrorListener() {
 
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                gs.alerter("Error");
+
+            }
+        };
+    }
 
 }
