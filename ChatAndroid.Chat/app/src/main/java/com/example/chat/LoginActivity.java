@@ -12,6 +12,9 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,7 +30,7 @@ public class LoginActivity extends RestActivity implements View.OnClickListener 
     public void traiteReponse(JSONObject result, String action) {
         if (action.contentEquals("connexion")) {
             if (result != null ) {
-                login(result);
+                //login(result);
             }
         }
     }
@@ -82,26 +85,54 @@ public class LoginActivity extends RestActivity implements View.OnClickListener 
 
     }
 
-    private void login(JSONObject result) {
-        Log.i("L4-SI-Logs", result.toString());
-        //LoginActivity.this.gs.alerter(result.toString());
+    private void sendLoginRequest() {
+        String login = champLogin.getText().toString();
+        String passe = champPass.getText().toString();
 
-        // TODO: Vérifier la connexion ("connecte":true)
-        try {
-            if (result.getBoolean("connecte")) {
-                LoginActivity.this.gs.alerter("Connexion réussie");
-                LoginActivity.this.savePrefs();
-                // TODO: Changer d'activité vers choixConversation
-                Intent toChoixConv = new Intent(LoginActivity.this,ChoixConvActivity.class);
-                startActivity(toChoixConv);
+        String qs = "action=connexion&login=" + login + "&passe=" +passe;
+
+        // On se sert des services offerts par RestActivity,
+        // qui propose des méthodes d'envoi de requetes asynchrones
+        envoiRequete(qs, login(), this.printError());
+    }
+
+    private Response.Listener<JSONObject> login() {
+        return new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject result) {
+                Log.i("L4-SI-Logs", result.toString());
+                //LoginActivity.this.gs.alerter(result.toString());
+
+                // TODO: Vérifier la connexion ("connecte":true)
+                try {
+                    if (result.getBoolean("connecte")) {
+                        LoginActivity.this.gs.alerter("Connexion réussie");
+                        LoginActivity.this.savePrefs();
+                        // TODO: Changer d'activité vers choixConversation
+                        Intent toChoixConv = new Intent(LoginActivity.this,ChoixConvActivity.class);
+                        startActivity(toChoixConv);
+
+                    }
+                    else {
+                        LoginActivity.this.gs.alerter("Connexion échouée");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+    }
+
+    private Response.ErrorListener printError() {
+        return new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                gs.alerter("Error");
 
             }
-            else {
-                LoginActivity.this.gs.alerter("Connexion échouée");
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        };
     }
 
     private void savePrefs() {
@@ -149,21 +180,9 @@ public class LoginActivity extends RestActivity implements View.OnClickListener 
         switch (v.getId()) {
             case R.id.login_cbRemember : // Clic sur case à cocher
                 savePrefs();
-
                 break;
-
-
             case R.id.login_btnOK :
-
-                String login = champLogin.getText().toString();
-                String passe = champPass.getText().toString();
-
-                String qs = "action=connexion&login=" + login + "&passe=" +passe;
-
-                // On se sert des services offerts par RestActivity,
-                // qui propose des méthodes d'envoi de requetes asynchrones
-                envoiRequete(qs, "connexion");
-
+                sendLoginRequest();
                 break;
 
         }
