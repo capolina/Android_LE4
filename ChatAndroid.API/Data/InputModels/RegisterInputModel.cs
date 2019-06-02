@@ -8,5 +8,6 @@ namespace ChatAndroid.API.Data.InputModels
         public string Username { get; set; }
         [Required]
         public string Password { get; set; }
+        public string Couleur { get; set; }
     }
 }

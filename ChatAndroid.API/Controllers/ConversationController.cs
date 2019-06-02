@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -29,7 +30,7 @@ namespace ChatAndroid.API.Controllers
         }
 
         [ HttpGet("{id}") ]
-        public async Task<IActionResult> GetConversation(int id)
+        public async Task<IActionResult> GetConversation(int id, int idLastMessage = 0)
         {
             var conversation = await _db.Conversations.Include(m => m.Messages)
                                                       .ThenInclude(m => m.User)
@@ -41,7 +42,7 @@ namespace ChatAndroid.API.Controllers
                 return NotFound();
             }
 
-            var conversationView = ConversationViewMapping.MapConversationViewModel().Compile().Invoke(conversation);
+            var conversationView = ConversationViewMapping.MapConversationViewModel(idLastMessage).Compile().Invoke(conversation);
             
             return Ok(conversationView);
         }
