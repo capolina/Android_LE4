@@ -1,6 +1,5 @@
 package com.example.chat;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -9,6 +8,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.volley.Response;
+import com.example.chat.Model.ListeMessages;
+import com.example.chat.Model.Message;
+import com.example.chat.TypeAdapter.ColorTypeAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

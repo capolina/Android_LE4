@@ -5,15 +5,13 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
+import com.example.chat.Model.RestResponse;
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
@@ -97,7 +95,7 @@ public class LoginActivity extends RestActivity implements View.OnClickListener 
 
                 Gson mGson = new Gson();
 
-                Login login = mGson.fromJson(result.toString(), Login.class);
+                RestResponse login = mGson.fromJson(result.toString(), RestResponse.class);
 
                 if (login.getConnecte()) {
                     LoginActivity.this.gs.alerter("Connexion réussie");

@@ -1,4 +1,4 @@
-package com.example.chat;
+package com.example.chat.TypeAdapter;
 
 import android.graphics.Color;
 
@@ -9,7 +9,7 @@ import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
 
-class ColorTypeAdapter implements JsonDeserializer<Integer>
+public class ColorTypeAdapter implements JsonDeserializer<Integer>
 {
     public Integer deserialize(JsonElement json, Type typeOfT,
                                JsonDeserializationContext context) throws JsonParseException

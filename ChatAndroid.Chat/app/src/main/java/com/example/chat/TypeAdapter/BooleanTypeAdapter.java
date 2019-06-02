@@ -1,8 +1,9 @@
-package com.example.chat;
+package com.example.chat.TypeAdapter;
 
 import java.lang.reflect.Type;
 import com.google.gson.*;
-class BooleanTypeAdapter implements JsonDeserializer<Boolean>
+
+public class BooleanTypeAdapter implements JsonDeserializer<Boolean>
 {
     public Boolean deserialize(JsonElement json, Type typeOfT,
                                JsonDeserializationContext context) throws JsonParseException
