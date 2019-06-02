@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using ChatAndroid.API.Configuration;
 using ChatAndroid.API.Data.InputModels;
 using ChatAndroid.API.Data.Models;
+using ChatAndroid.API.Data.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -49,7 +50,11 @@ namespace ChatAndroid.API.Controllers
             if (res.Succeeded)
             {
                 var logUser = await _userManager.FindByNameAsync(user.Username);
-                return Ok(await GenerateJwtToken(user.Username, logUser));
+                var response = new LoginViewModel
+                {
+                    Token = await GenerateJwtToken(user.Username, logUser)
+                };
+                return Ok(response);
             }
             
             ModelState.AddModelError("LoginError", "Bad Username or Password");
