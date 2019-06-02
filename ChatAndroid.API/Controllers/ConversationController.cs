@@ -93,7 +93,8 @@ namespace ChatAndroid.API.Controllers
             await _db.Messages.AddAsync(newMessage);
             await _db.SaveChangesAsync();
             
-            return Ok();
+            //send empty json so the app doesn't fail
+            return Ok(new {});
         }
     }
 }
