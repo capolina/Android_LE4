@@ -44,7 +44,7 @@ public abstract class RestActivity extends AppCompatActivity {
 
                 return params;
             }
-        };;
+        };
 
         // Access the RequestQueue through your singleton class.
         RequestQueueSingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjectRequest);

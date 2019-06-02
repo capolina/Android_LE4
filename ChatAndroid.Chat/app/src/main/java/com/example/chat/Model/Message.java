@@ -1,22 +1,26 @@
 package com.example.chat.Model;
 
 
+import com.google.gson.annotations.SerializedName;
+
 public class Message {
 
     /*
-     * {"connecte":true,
-     *  "action":"getMessages",
-     *  "feedback":"entrez action: logout, setPasse(passe),setPseudo(pseudo), setCouleurDiese(couleurRGV sans diese), setCouleur(couleur string),getConversations, getMessages(idConv,[idLastMessage]), setMessage(idConv,contenu), ...",
-     *  "messages":[{"id":"1","contenu":"message","auteur":"user","couleur":"#"},
-     *              {"id":"2","contenu":"message","auteur":"user","couleur":"#"},
-     *              {"id":"23","contenu":"balbla","auteur":"user","couleur":"#"},
-     *              {"id":"32","contenu":"Varane ballon d'or","auteur":"user","couleur":"#"},
-     *              {"id":"33","contenu":"Test","auteur":"user","couleur":"#"}],
-     *  "idLastMessage":"33"}
+     * {"conversationId":1,
+     * "active":true,
+     * "theme":"Ma nouvelle conversation"
+     * ,"messages":[
+     *      {"messageId":6,
+     *      "userName":"Coco",
+     *      "couleur":"black",
+     *      "contenu":"My New First Message"},
+     *      {"messageId":7,"userName":"Coco","couleur":"black","contenu":"My New Second Message"},{"messageId":8,"userName":"Coco","couleur":"black","contenu":"My New Second Message"},{"messageId":9,"userName":"Coco","couleur":"black","contenu":"My New Second Message"},{"messageId":10,"userName":"Coco","couleur":"black","contenu":"My New Second Message"},{"messageId":11,"userName":"Coco","couleur":"black","contenu":"My New Message"},{"messageId":12,"userName":"Coco","couleur":"black","contenu":"My New Message"}]}
      * */
 
+    @SerializedName("messageId")
     private int id;
     private String contenu;
+    @SerializedName("userName")
     private String auteur;
     private Integer couleur;
 

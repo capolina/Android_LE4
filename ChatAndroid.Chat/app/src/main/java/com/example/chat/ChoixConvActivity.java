@@ -54,7 +54,6 @@ public class ChoixConvActivity extends RestActivity implements View.OnClickListe
 
     private void chargerConvs(JSONObject o) {
         gs.alerter(o.toString());
-
         // On transforme notre objet JSON en une liste de "Conversations"
         // On pourrait utiliser la librairie GSON pour automatiser ce processus d'interprétation
         // des objets JSON reçus
@@ -64,11 +63,14 @@ public class ChoixConvActivity extends RestActivity implements View.OnClickListe
         // On parcourt l’objet JSON pour instancier des Conversations, que l’on insère dans la liste
 
         /*
-         * {"connecte":true,
-         * "action":"getConversations",
-         * "feedback":"entrez action: logout, setPasse(passe),setPseudo(pseudo), setCouleur(couleur),getConversations, getMessages(idConv,[idLastMessage]), setMessage(idConv,contenu), ...",
-         * "conversations":[ {"id":"12","active":"1","theme":"Les cours en IAM"},
-         *                   {"id":"2","active":"1","theme":"Ballon d'Or"}]}
+         * {"conversations":[
+         *      {"conversationId":1,
+         *          "active":true,
+         *          "theme":"Ma nouvelle conversation",
+         *          "messages":null},
+         *       {"conversationId":2,
+         *          "active":true,
+         *          "theme":"Ma nouvelle conversation 2","messages":null},{"conversationId":3,"active":true,"theme":"Ma nouvelle conversation 2","messages":null},{"conversationId":4,"active":true,"theme":"Ma nouvelle conversation 3","messages":null}]}
          * */
 
         GsonBuilder builder = new GsonBuilder();

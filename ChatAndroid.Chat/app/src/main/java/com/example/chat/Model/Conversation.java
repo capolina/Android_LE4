@@ -1,16 +1,22 @@
 package com.example.chat.Model;
 
 
+import com.google.gson.annotations.SerializedName;
+
 public class Conversation {
 
     /*
-     * {"connecte":true,
-     * "action":"getConversations",
-     * "feedback":"entrez action: logout, setPasse(passe),setPseudo(pseudo), setCouleur(couleur),getConversations, getMessages(idConv,[idLastMessage]), setMessage(idConv,contenu), ...",
-     * "conversations":[ {"id":"12","active":"1","theme":"Les cours en IAM"},
-     *                   {"id":"2","active":"1","theme":"Ballon d'Or"}]}
+     * {"conversations":[
+     *      {"conversationId":1,
+     *          "active":true,
+     *          "theme":"Ma nouvelle conversation",
+     *          "messages":null},
+     *       {"conversationId":2,
+     *          "active":true,
+     *          "theme":"Ma nouvelle conversation 2","messages":null},{"conversationId":3,"active":true,"theme":"Ma nouvelle conversation 2","messages":null},{"conversationId":4,"active":true,"theme":"Ma nouvelle conversation 3","messages":null}]}
      * */
 
+    @SerializedName("conversationId")
     private int id;
     private String theme;
     private Boolean active;

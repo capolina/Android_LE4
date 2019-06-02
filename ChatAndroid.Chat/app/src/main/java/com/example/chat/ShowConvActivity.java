@@ -15,6 +15,7 @@ import com.example.chat.TypeAdapter.ColorTypeAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ShowConvActivity extends RestActivity implements View.OnClickListener {
@@ -65,7 +66,7 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
             for (Message message : listeMessages.getList()) {
                 addMessage(message);
             }
-            idLastMessage = listeMessages.getIdLastMessage();
+            idLastMessage = listeMessages.getList().get(listeMessages.getList().size()-1).getId();
         }
 
     }
@@ -104,8 +105,8 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
     public String urlPeriodique() {
         String qs = "";
 
-        qs = "action=getMessages&idConv=" + idConv;
-        qs += "&idLastMessage=" + idLastMessage;
+        qs = "conversation/" + idConv;
+        qs += "?idLastMessage=" + idLastMessage;
 
         return qs;
     }
@@ -119,8 +120,16 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
 
         //Prevent from sending empty messages
         if (!msg.isEmpty()) {
-            String qs = "action=setMessage&idConv=" + idConv + "&contenu=" + msg;
-            envoiRequete(qs, Request.Method.GET, null, postMessageCallBack());
+            JSONObject request = new JSONObject();
+            try {
+                request.put("contenu", msg);
+            } catch(JSONException e) {
+                gs.alerter("Error while logging in");
+            }
+
+
+            String qs = "conversation/" + idConv + "/message";
+            envoiRequete(qs, Request.Method.POST, request, postMessageCallBack());
             edtMsg.setText("");
         }
 
