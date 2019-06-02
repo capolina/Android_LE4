@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.android.volley.Request;
 import com.android.volley.Response;
 import com.example.chat.Model.Conversation;
 import com.example.chat.Model.ListeConversations;
@@ -36,11 +37,11 @@ public class ChoixConvActivity extends RestActivity implements View.OnClickListe
 
         // Au démarrage de l'activité, réaliser une requete
         // Pour récupérer les conversations
-        String qs = "action=getConversations";
+        String qs = "conversation";
 
         // On se sert des services offerts par RestActivity,
         // qui propose des méthodes d'envoi de requetes asynchrones
-        envoiRequete(qs, loadConversationsCallBack());
+        envoiRequete(qs, Request.Method.GET, null, loadConversationsCallBack());
 
         listeConvs = new ListeConversations();
 

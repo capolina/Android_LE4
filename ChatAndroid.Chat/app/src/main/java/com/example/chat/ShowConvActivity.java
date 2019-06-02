@@ -7,6 +7,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.android.volley.Request;
 import com.android.volley.Response;
 import com.example.chat.Model.ListeMessages;
 import com.example.chat.Model.Message;
@@ -42,7 +43,7 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
         // qui permet d'indiquer le dernier message dont on dispose
         // action=getMessages&idConv=<ID>&idLastMessage=<NUMERO>
 
-        requetePeriodique(10, loadMessageCallBack());
+        requetePeriodique(10, Request.Method.GET, null, loadMessageCallBack());
         msgLayout = findViewById(R.id.conversation_svLayoutMessages);
 
         btnOK = findViewById(R.id.conversation_btnOK);
@@ -119,7 +120,7 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
         //Prevent from sending empty messages
         if (!msg.isEmpty()) {
             String qs = "action=setMessage&idConv=" + idConv + "&contenu=" + msg;
-            envoiRequete(qs, postMessageCallBack());
+            envoiRequete(qs, Request.Method.GET, null, postMessageCallBack());
             edtMsg.setText("");
         }
 

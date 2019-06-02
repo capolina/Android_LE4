@@ -1,5 +1,7 @@
 package com.example.chat;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -12,10 +14,10 @@ import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import org.json.JSONObject;
 
 
 public abstract class RestActivity extends AppCompatActivity {
@@ -27,20 +29,29 @@ public abstract class RestActivity extends AppCompatActivity {
     // comment faire pour controler quelle requete se termine ?
     // on passe une seconde chaine à l'appel asynchrone
 
-    public void envoiRequete(String qs, Response.Listener<JSONObject> onResponse, Response.ErrorListener onErrorResponse) {
+    public void envoiRequete(String qs, int method, JSONObject request, Response.Listener<JSONObject> onResponse, Response.ErrorListener onErrorResponse) {
         String url = gs.getUrl(qs);
 
         gs.alerter(url);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, url, null, onResponse, onErrorResponse);
+                (method, url, request, onResponse, onErrorResponse)
+        {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String>  params = new HashMap<>();
+                params.put("Authorization", "Bearer " + gs.getToken());
+
+                return params;
+            }
+        };;
 
         // Access the RequestQueue through your singleton class.
         RequestQueueSingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void envoiRequete(String qs, Response.Listener<JSONObject> onResponse) {
-        envoiRequete(qs, onResponse, printError());
+    public void envoiRequete(String qs, int method, JSONObject request, Response.Listener<JSONObject> onResponse) {
+        envoiRequete(qs, method, request, onResponse, printError());
     }
 
     public String urlPeriodique() {
@@ -53,7 +64,7 @@ public abstract class RestActivity extends AppCompatActivity {
     // Try AlarmManager running Service
     // http://rmdiscala.developpez.com/cours/LesChapitres.html/Java/Cours3/Chap3.1.htm
     // La requete elle-même sera récupérée grace à l'action demandée dans la méthode urlPeriodique
-    public void requetePeriodique(int periode, final Response.Listener<JSONObject> onResponse, final Response.ErrorListener onErrorResponse) {
+    public void requetePeriodique(int periode, final int method, final JSONObject request, final Response.Listener<JSONObject> onResponse, final Response.ErrorListener onErrorResponse) {
 
         TimerTask doAsynchronousTask;
         final Handler handler = new Handler();
@@ -66,7 +77,7 @@ public abstract class RestActivity extends AppCompatActivity {
 
                 handler.post(new Runnable() {
                     public void run() {
-                        envoiRequete(urlPeriodique(), onResponse, onErrorResponse);
+                        envoiRequete(urlPeriodique(), method, request, onResponse, onErrorResponse);
                     }
                 });
 
@@ -78,8 +89,8 @@ public abstract class RestActivity extends AppCompatActivity {
 
     }
 
-    public void requetePeriodique(int periode, final Response.Listener<JSONObject> onResponse) {
-        requetePeriodique(periode, onResponse, printError());
+    public void requetePeriodique(int periode, final int method, final JSONObject request, final Response.Listener<JSONObject> onResponse) {
+        requetePeriodique(periode, method, request, onResponse, printError());
     }
 
     @Override

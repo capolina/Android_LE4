@@ -10,10 +10,12 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import com.android.volley.Request;
 import com.android.volley.Response;
-import com.example.chat.Model.RestResponse;
+import com.example.chat.Model.Login;
 import com.google.gson.Gson;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class LoginActivity extends RestActivity implements View.OnClickListener {
@@ -76,13 +78,21 @@ public class LoginActivity extends RestActivity implements View.OnClickListener 
 
     private void sendLoginRequest() {
         String login = champLogin.getText().toString();
-        String passe = champPass.getText().toString();
+        String pass = champPass.getText().toString();
 
-        String qs = "action=connexion&login=" + login + "&passe=" +passe;
+        JSONObject request = new JSONObject();
+        try {
+            request.put("username", login);
+            request.put("password", pass);
+        } catch(JSONException e) {
+            gs.alerter("Error while logging in");
+        }
+
+        String qs = "user/login";
 
         // On se sert des services offerts par RestActivity,
         // qui propose des méthodes d'envoi de requetes asynchrones
-        envoiRequete(qs, login());
+        envoiRequete(qs, Request.Method.POST, request, login());
     }
 
     private Response.Listener<JSONObject> login() {
@@ -95,19 +105,13 @@ public class LoginActivity extends RestActivity implements View.OnClickListener 
 
                 Gson mGson = new Gson();
 
-                RestResponse login = mGson.fromJson(result.toString(), RestResponse.class);
+                Login login = mGson.fromJson(result.toString(), Login.class);
 
-                if (login.getConnecte()) {
-                    LoginActivity.this.gs.alerter("Connexion réussie");
-                    LoginActivity.this.savePrefs();
-                    // TODO: Changer d'activité vers choixConversation
-                    Intent toChoixConv = new Intent(LoginActivity.this,ChoixConvActivity.class);
-                    startActivity(toChoixConv);
+                LoginActivity.this.gs.alerter("Connexion réussie");
+                LoginActivity.this.gs.setToken(login.getToken());
 
-                }
-                else {
-                    LoginActivity.this.gs.alerter("Connexion échouée");
-                }
+                Intent toChoixConv = new Intent(LoginActivity.this,ChoixConvActivity.class);
+                startActivity(toChoixConv);
             }
         };
     }
@@ -127,7 +131,8 @@ public class LoginActivity extends RestActivity implements View.OnClickListener 
             editor.putString("login", "");
             editor.putString("passe", "");
         }
-        editor.commit();
+        // editor.putString("urlData", settings.getString("urlData", "http://10.0.2.2/android_chat/data.php"));
+        editor.apply();
     }
 
     @Override

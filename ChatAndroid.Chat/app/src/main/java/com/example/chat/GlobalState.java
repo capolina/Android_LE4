@@ -55,10 +55,10 @@ public class GlobalState extends Application {
 
     public String getUrl(String qs) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String urlData = prefs.getString("urlData","http://10.0.2.2/android_chat/data.php");
+        String urlData = prefs.getString("urlData","http://apolinario.fr");
 
         try {
-            URL url = new URL(urlData + "?" + qs);
+            URL url = new URL(urlData + "/" + qs);
 
             return url.toString();
         } catch (MalformedURLException e) {
@@ -66,6 +66,19 @@ public class GlobalState extends Application {
         }
 
         return "";
+    }
+
+    public String getToken() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        return prefs.getString("token","");
+    }
+
+    public void setToken(String token) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor e = prefs.edit();
+
+        e.putString("token", token);
+        e.apply();
     }
 
     public String requete(String qs) {
