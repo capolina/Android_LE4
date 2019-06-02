@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using ChatAndroid.API.Configuration;
 using ChatAndroid.API.Data.InputModels;
 using ChatAndroid.API.Data.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -54,6 +56,15 @@ namespace ChatAndroid.API.Controllers
             return BadRequest(ModelState);
         }
         
+        [Authorize]
+        [ HttpPost("logout") ]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            
+            return Ok();
+        }
+        
         [ HttpPost("register") ]
         public async Task<IActionResult> Register([FromBody] RegisterInputModel user)
         {
@@ -63,16 +74,15 @@ namespace ChatAndroid.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var newuser = new User
+            var newUser = new User
             {
                 UserName = user.Username,
                 Admin = false,
                 Blacklist = false,
                 Connecte = false,
-                Couleur = "Black"
-            
+                Couleur = user.Couleur ?? "black"
             };
-            result = await _userManager.CreateAsync(newuser, user.Password);
+            result = await _userManager.CreateAsync(newUser, user.Password);
 
             if (result.Succeeded)
             {

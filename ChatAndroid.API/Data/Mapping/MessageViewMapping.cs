@@ -13,7 +13,8 @@ namespace ChatAndroid.API.Data.Mapping
             {
                 Contenu        = m.Contenu,
                 MessageId      = m.MessageId,
-                UserName       = m.User.UserName
+                UserName       = m.User.UserName,
+                Couleur        = m.User.Couleur ?? "black"
             };
         }
     }

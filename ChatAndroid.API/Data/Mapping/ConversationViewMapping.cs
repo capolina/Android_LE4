@@ -8,12 +8,12 @@ namespace ChatAndroid.API.Data.Mapping
 {
     public class ConversationViewMapping
     {
-        public static Expression<Func<Conversation, ConversationViewModel>> MapConversationViewModel()
+        public static Expression<Func<Conversation, ConversationViewModel>> MapConversationViewModel(int? lastId)
         {
             return c => new ConversationViewModel
             {
                 ConversationId = c.ConversationId,
-                Messages       = c.Messages.Select(m => MessageViewMapping.MapMessageViewModel().Compile().Invoke(m)).ToList(),
+                Messages       = c.Messages.Where(m => m.MessageId >= lastId).Select(m => MessageViewMapping.MapMessageViewModel().Compile().Invoke(m)).ToList(),
                 Active         = c.Active,
                 Theme          = c.Theme
             };
