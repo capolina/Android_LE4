@@ -14,8 +14,8 @@ import android.widget.EditText;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.gson.Gson;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class LoginActivity extends RestActivity implements View.OnClickListener {
@@ -95,21 +95,20 @@ public class LoginActivity extends RestActivity implements View.OnClickListener 
                 Log.i("L4-SI-Logs", result.toString());
                 //LoginActivity.this.gs.alerter(result.toString());
 
-                // TODO: Vérifier la connexion ("connecte":true)
-                try {
-                    if (result.getBoolean("connecte")) {
-                        LoginActivity.this.gs.alerter("Connexion réussie");
-                        LoginActivity.this.savePrefs();
-                        // TODO: Changer d'activité vers choixConversation
-                        Intent toChoixConv = new Intent(LoginActivity.this,ChoixConvActivity.class);
-                        startActivity(toChoixConv);
+                Gson mGson = new Gson();
 
-                    }
-                    else {
-                        LoginActivity.this.gs.alerter("Connexion échouée");
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                Login login = mGson.fromJson(result.toString(), Login.class);
+
+                if (login.getConnecte()) {
+                    LoginActivity.this.gs.alerter("Connexion réussie");
+                    LoginActivity.this.savePrefs();
+                    // TODO: Changer d'activité vers choixConversation
+                    Intent toChoixConv = new Intent(LoginActivity.this,ChoixConvActivity.class);
+                    startActivity(toChoixConv);
+
+                }
+                else {
+                    LoginActivity.this.gs.alerter("Connexion échouée");
                 }
             }
         };
