@@ -1,5 +1,6 @@
 package com.example.chat;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -9,11 +10,9 @@ import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.example.chat.Model.ListeMessages;
+import com.example.chat.Model.Conversation;
 import com.example.chat.Model.Message;
-import com.example.chat.TypeAdapter.ColorTypeAdapter;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,17 +55,14 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
     }
 
     private void loadMessages(JSONObject o) {
-        GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(Integer.class, new ColorTypeAdapter());
-        Gson mGson = builder.create();
+        Gson mGson = new Gson();
+        Conversation conversation = mGson.fromJson(o.toString(), Conversation.class);
 
-        ListeMessages listeMessages = mGson.fromJson(o.toString(), ListeMessages.class);
-
-        if (listeMessages.getList().size() > 0) {
-            for (Message message : listeMessages.getList()) {
+        if (conversation.getMessages().size() > 0) {
+            for (Message message : conversation.getMessages()) {
                 addMessage(message);
             }
-            idLastMessage = listeMessages.getList().get(listeMessages.getList().size()-1).getId();
+            idLastMessage = conversation.getMessages().get(conversation.getMessages().size()-1).getId();
         }
 
     }
@@ -74,7 +70,7 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
     private void addMessage(Message msg) {
         TextView tv = new TextView(this);
         tv.setText("[" + msg.getAuteur() + "] " + msg.getContenu());
-        tv.setTextColor(msg.getCouleur());
+        tv.setTextColor(Color.parseColor(msg.getCouleur()));
 
         msgLayout.addView(tv);
     }

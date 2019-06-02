@@ -16,9 +16,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.example.chat.Model.Conversation;
 import com.example.chat.Model.ListeConversations;
-import com.example.chat.TypeAdapter.BooleanTypeAdapter;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import org.json.JSONObject;
 
@@ -73,9 +71,7 @@ public class ChoixConvActivity extends RestActivity implements View.OnClickListe
          *          "theme":"Ma nouvelle conversation 2","messages":null},{"conversationId":3,"active":true,"theme":"Ma nouvelle conversation 2","messages":null},{"conversationId":4,"active":true,"theme":"Ma nouvelle conversation 3","messages":null}]}
          * */
 
-        GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(Boolean.class, new BooleanTypeAdapter());
-        Gson mGson = builder.create();
+        Gson mGson = new Gson();
 
         listeConvs = mGson.fromJson(o.toString(), ListeConversations.class);
 

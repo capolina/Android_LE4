@@ -22,9 +22,7 @@ public class Message {
     private String contenu;
     @SerializedName("userName")
     private String auteur;
-    private Integer couleur;
-
-    // Raccourci : Alt+Ins pour générer getters, setters et constructeurs
+    private String couleur;
 
     public Message() {
     }
@@ -51,7 +49,7 @@ public class Message {
         return auteur;
     }
 
-    public int getCouleur() {
+    public String getCouleur() {
         return couleur;
     }
 }

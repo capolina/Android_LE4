@@ -3,6 +3,8 @@ package com.example.chat.Model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+
 public class Conversation {
 
     /*
@@ -20,10 +22,14 @@ public class Conversation {
     private int id;
     private String theme;
     private Boolean active;
+    private ArrayList<Message> messages;
 
     // Raccourci : Alt+Ins pour générer getters, setters et constructeurs
 
 
+    public Conversation() {
+        this.messages = new ArrayList<>();
+    }
     public Conversation(int id, String theme, Boolean active) {
         this.id = id;
         this.theme = theme;
@@ -49,5 +55,9 @@ public class Conversation {
 
     public Boolean getActive() {
         return active;
+    }
+
+    public ArrayList<Message> getMessages() {
+        return messages;
     }
 }

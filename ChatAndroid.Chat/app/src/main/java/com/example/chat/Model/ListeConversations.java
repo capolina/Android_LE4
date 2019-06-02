@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 
-public class ListeConversations extends RestResponse {
+public class ListeConversations {
 
     @SerializedName("conversations")
     private ArrayList<Conversation> list;
@@ -21,8 +21,7 @@ public class ListeConversations extends RestResponse {
     @Override
     public String toString() {
         return "ListeConversations{" +
-                super.toString() +
-                ", list=" + list +
+                "list=" + list +
                 '}';
     }
 }
