@@ -44,16 +44,4 @@ public class Conversation {
     public Boolean getActive() {
         return active;
     }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setTheme(String theme) {
-        this.theme = theme;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
 }

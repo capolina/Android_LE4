@@ -13,12 +13,15 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.android.volley.Response;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ChoixConvActivity extends RestActivity implements View.OnClickListener {
 
@@ -67,25 +70,11 @@ public class ChoixConvActivity extends RestActivity implements View.OnClickListe
          *                   {"id":"2","active":"1","theme":"Ballon d'Or"}]}
          * */
 
-        int i;
-        JSONArray convs = null;
-        try {
-            convs = o.getJSONArray("conversations");
-            for(i=0;i<convs.length();i++) {
-                JSONObject nextConv = (JSONObject) convs.get(i);
+        GsonBuilder builder = new GsonBuilder();
+        builder.registerTypeAdapter(Boolean.class, new BooleanTypeAdapter());
+        Gson mGson = builder.create();
 
-                int id =Integer.parseInt(nextConv.getString("id"));
-                String theme = nextConv.getString("theme");
-                Boolean active = ((String) nextConv.getString("active")).contentEquals("1");
-
-                gs.alerter("Conv " + id  + " theme = " + theme + " active ?" + active);
-                Conversation c = new Conversation(id,theme,active);
-
-                listeConvs.addConversation(c);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        listeConvs = mGson.fromJson(o.toString(), ListeConversations.class);
 
         gs.alerter(listeConvs.toString());
 
