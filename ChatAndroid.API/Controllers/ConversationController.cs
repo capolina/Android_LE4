@@ -6,6 +6,7 @@ using ChatAndroid.API.Data;
 using ChatAndroid.API.Data.InputModels;
 using ChatAndroid.API.Data.Mapping;
 using ChatAndroid.API.Data.Models;
+using ChatAndroid.API.Data.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,9 +25,15 @@ namespace ChatAndroid.API.Controllers
         }
         
         [ HttpGet("") ]
-        public IActionResult GetConversations()
+        public async Task<IActionResult> GetConversations()
         {
-            return Ok(_db.Conversations.Select(ConversationListViewMapping.MapConversationViewModel()));
+            var conversations = new ConversationListViewModel
+            {
+                Conversations = await _db.Conversations
+                                         .Select(ConversationListViewMapping.MapConversationViewModel())
+                                         .ToListAsync()
+            };
+            return Ok(conversations);
         }
 
         [ HttpGet("{id}") ]
