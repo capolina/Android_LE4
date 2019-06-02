@@ -9,6 +9,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.volley.Response;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,7 +19,7 @@ import org.json.JSONObject;
 public class ShowConvActivity extends RestActivity implements View.OnClickListener {
 
     private int idConv;
-    private int idLastMessage = 0;
+    private int idLastMessage;
 
     private LinearLayout msgLayout;
     private Button btnOK;
@@ -47,36 +49,30 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
         btnOK.setOnClickListener(this);
 
         edtMsg = findViewById(R.id.conversation_edtMessage);
+
+        idLastMessage = 0;
     }
 
     private void loadMessages(JSONObject o) {
-        try {
-            // parcours des messages
-            JSONArray messages = o.getJSONArray("messages");
-            int i;
-            for(i=0;i<messages.length();i++) {
-                addMessage((JSONObject) messages.get(i));
-            }
+        GsonBuilder builder = new GsonBuilder();
+        builder.registerTypeAdapter(Integer.class, new ColorTypeAdapter());
+        Gson mGson = builder.create();
 
-            // mise à jour du numéro du dernier message
-            idLastMessage = Integer.parseInt(o.getString("idLastMessage"));
-        } catch (JSONException e) {
-            e.printStackTrace();
+        ListeMessages listeMessages = mGson.fromJson(o.toString(), ListeMessages.class);
+
+        if (listeMessages.getList().size() > 0) {
+            for (Message message : listeMessages.getList()) {
+                addMessage(message);
+            }
+            idLastMessage = listeMessages.getIdLastMessage();
         }
+
     }
 
-    private void addMessage(JSONObject msg) throws JSONException {
-        String contenu =  msg.getString("contenu");
-        String auteur =  msg.getString("auteur");
-        String couleur =  msg.getString("couleur");
-
+    private void addMessage(Message msg) {
         TextView tv = new TextView(this);
-        tv.setText("[" + auteur + "] " + contenu);
-        try{
-            tv.setTextColor(Color.parseColor(couleur));
-        } catch (NumberFormatException e) {
-            tv.setTextColor(Color.BLACK);
-        }
+        tv.setText("[" + msg.getAuteur() + "] " + msg.getContenu());
+        tv.setTextColor(msg.getCouleur());
 
         msgLayout.addView(tv);
     }
@@ -119,10 +115,13 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
         // conversation_edtMessage
 
         String msg = edtMsg.getText().toString();
-        String qs="action=setMessage&idConv=" + idConv +"&contenu=" + msg;
 
-        envoiRequete(qs, postMessageCallBack());
+        //Prevent from sending empty messages
+        if (!msg.isEmpty()) {
+            String qs = "action=setMessage&idConv=" + idConv + "&contenu=" + msg;
+            envoiRequete(qs, postMessageCallBack());
+            edtMsg.setText("");
+        }
 
-        edtMsg.setText("");
     }
 }
