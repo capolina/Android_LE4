@@ -1,7 +1,5 @@
-package com.example.chat;
+package com.example.chat.Model;
 
-
-import android.graphics.Color;
 
 public class Message {
 

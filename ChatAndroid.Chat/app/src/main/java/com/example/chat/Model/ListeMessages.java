@@ -1,10 +1,10 @@
-package com.example.chat;
+package com.example.chat.Model;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 
-public class ListeMessages {
+public class ListeMessages extends RestResponse {
 
     /*
      * {"connecte":true,
@@ -18,12 +18,12 @@ public class ListeMessages {
      *  "idLastMessage":"33"}
      * */
 
-    private Boolean connecte;
     @SerializedName("messages")
     private ArrayList<Message> list;
     private int idLastMessage;
 
     public ListeMessages() {
+        super();
         this.list = new ArrayList<>();
     }
 
@@ -35,11 +35,13 @@ public class ListeMessages {
         return idLastMessage;
     }
 
+
     @Override
     public String toString() {
         return "ListeMessages{" +
-                "list=" + list +
+                super.toString() +
+                ", list=" + list +
+                ", idLastMessage=" + idLastMessage +
                 '}';
     }
-
 }

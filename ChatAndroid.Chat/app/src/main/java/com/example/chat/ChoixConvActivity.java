@@ -13,6 +13,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.android.volley.Response;
+import com.example.chat.Model.Conversation;
+import com.example.chat.Model.ListeConversations;
+import com.example.chat.TypeAdapter.BooleanTypeAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
