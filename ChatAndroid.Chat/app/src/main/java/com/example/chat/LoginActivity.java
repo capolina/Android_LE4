@@ -11,6 +11,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 
 import com.android.volley.Request;
+import com.android.volley.VolleyError;
 import com.example.chat.Model.Login;
 import com.google.gson.Gson;
 
@@ -100,6 +101,22 @@ public class LoginActivity extends RestActivity implements View.OnClickListener 
         if(action.contentEquals("login"))
         {
             login(result);
+        }
+    }
+
+    @Override
+    public void errorCallBack(VolleyError error, String action)
+    {
+        if(action.contentEquals("login"))
+        {
+            Log.e(gs.CAT, String.valueOf(error.networkResponse.statusCode));
+            switch( error.networkResponse.statusCode) {
+                case 400:
+                    gs.alerter("Bad username or password");
+                    break;
+                default:
+                    gs.alerter("Unknown error");
+            }
         }
     }
 

@@ -63,7 +63,7 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
         }
         else if(action.contentEquals("postMessage"))
         {
-            postMessageCallBack(result);
+            postMessageCallBack();
         }
     }
 
@@ -88,7 +88,7 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
         msgLayout.addView(tv);
     }
 
-    private void postMessageCallBack(JSONObject result) {
+    private void postMessageCallBack() {
         gs.alerter("Message posté");
     }
 
@@ -114,7 +114,7 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
             try {
                 request.put("contenu", msg);
             } catch(JSONException e) {
-                gs.alerter("Error while logging in");
+                gs.alerter("Error while sending the message");
             }
 
 
