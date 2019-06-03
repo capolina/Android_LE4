@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.Switch;
 
 import com.android.volley.Request;
-import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.example.chat.Model.Login;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
@@ -92,28 +92,47 @@ public class LoginActivity extends RestActivity implements View.OnClickListener 
 
         // On se sert des services offerts par RestActivity,
         // qui propose des méthodes d'envoi de requetes asynchrones
-        envoiRequete(qs, Request.Method.POST, request, login());
+        envoiRequete(qs, "login", Request.Method.POST, request);
     }
 
-    private Response.Listener<JSONObject> login() {
-        return new Response.Listener<JSONObject>() {
+    @Override
+    public void successCallBack(JSONObject result, String action)
+    {
+        if(action.contentEquals("login"))
+        {
+            login(result);
+        }
+    }
 
-            @Override
-            public void onResponse(JSONObject result) {
-                Log.i("L4-SI-Logs", result.toString());
-                //LoginActivity.this.gs.alerter(result.toString());
-
-                Gson mGson = new Gson();
-
-                Login login = mGson.fromJson(result.toString(), Login.class);
-
-                LoginActivity.this.gs.alerter("Connexion réussie");
-                LoginActivity.this.gs.setToken(login.getToken());
-
-                Intent toChoixConv = new Intent(LoginActivity.this,ChoixConvActivity.class);
-                startActivity(toChoixConv);
+    @Override
+    public void errorCallBack(VolleyError error, String action)
+    {
+        if(action.contentEquals("login"))
+        {
+            Log.e(gs.CAT, String.valueOf(error.networkResponse.statusCode));
+            switch( error.networkResponse.statusCode) {
+                case 400:
+                    gs.alerter("Bad username or password");
+                    break;
+                default:
+                    gs.alerter("Unknown error");
             }
-        };
+        }
+    }
+
+    private void login(JSONObject result) {
+        Log.i("L4-SI-Logs", result.toString());
+        //LoginActivity.this.gs.alerter(result.toString());
+
+        Gson mGson = new Gson();
+
+        Login login = mGson.fromJson(result.toString(), Login.class);
+
+        LoginActivity.this.gs.alerter("Connexion réussie");
+        LoginActivity.this.gs.setToken(login.getToken());
+
+        Intent toChoixConv = new Intent(LoginActivity.this,ChoixConvActivity.class);
+        startActivity(toChoixConv);
     }
 
     private void savePrefs() {
