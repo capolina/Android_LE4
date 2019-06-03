@@ -7,10 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -20,13 +22,15 @@ import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
-import java.util.ArrayList;
+import java.util.List;
 
-public class ChoixConvActivity extends RestActivity implements View.OnClickListener {
+public class ChoixConvActivity extends RestActivity {
 
     private ListeConversations listeConvs;
-    private Button btnOK;
-    private Spinner sp;
+
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +48,12 @@ public class ChoixConvActivity extends RestActivity implements View.OnClickListe
 
         listeConvs = new ListeConversations();
 
-        btnOK = findViewById(R.id.choixConversation_btnOK);
-        btnOK.setOnClickListener(this);
 
-        sp = findViewById(R.id.choixConversation_choixConv);
+        mRecyclerView = findViewById(R.id.choixConversation_choixConv);
+        //mRecyclerView.setHasFixedSize(true);
+
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
 
     }
 
@@ -68,8 +74,8 @@ public class ChoixConvActivity extends RestActivity implements View.OnClickListe
         //gs.alerter(listeConvs.toString());
 
         // On peut maintenant appuyer sur le bouton
-        btnOK.setEnabled(true);
-        remplirSpinner();
+        //btnOK.setEnabled(true);
+        remplirRecyclerView();
     }
 
     private Response.Listener<JSONObject> loadConversationsCallBack() {
@@ -85,92 +91,88 @@ public class ChoixConvActivity extends RestActivity implements View.OnClickListe
         };
     }
 
-    private void remplirSpinner() {
+    private void remplirRecyclerView() {
 
-        // V2 : Utilisation d'un adapteur customisé qui permet de définir nous-même
-        // la forme des éléments à afficher
-
-        Spinner sp = findViewById(R.id.choixConversation_choixConv);
-
-        sp.setAdapter(new MyCustomAdapter(this,
-                R.layout.spinner_item,
-                listeConvs.getList()));
+        mAdapter = new MyAdapter(listeConvs.getList(), this);
+        mRecyclerView.setAdapter(mAdapter);
     }
 
-    @Override
-    public void onClick(View v) {
-        // lors du clic sur le bouton OK,
-        // récupérer l'id de la conversation sélectionnée
-        // démarrer l'activité d'affichage des messages
 
-        // NB : il faudrait être sur qu'on ne clique pas sur le bouton
-        // tant qu'on a pas fini de charger la liste des conversations
-        // On indique que le bouton est désactivé au départ.
+    public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> implements View.OnClickListener {
 
-        Conversation convSelected = (Conversation) sp.getSelectedItem();
-        gs.alerter("Conv sélectionnée : " + convSelected.getTheme());
+        private List<Conversation> dataModelList;
+        private Context mContext;
 
-        // On crée un Intent pour changer d'activité
-        Intent toShowConv = new Intent(this, ShowConvActivity.class);
-        Bundle bdl = new Bundle();
-        bdl.putInt("idConversation",convSelected.getId());
-        toShowConv.putExtras(bdl);
-        startActivity(toShowConv);
-    }
+        // View holder class whose objects represent each list item
 
-    public class MyCustomAdapter extends ArrayAdapter<Conversation> {
+        public class MyViewHolder extends RecyclerView.ViewHolder {
+            public ImageView spinner_icon;
+            public TextView spinner_theme;
 
-        private int layoutId;
-        private ArrayList<Conversation> dataConvs;
+            public MyViewHolder(@NonNull View itemView) {
+                super(itemView);
+                spinner_icon = itemView.findViewById(R.id.spinner_icon);
+                spinner_theme = itemView.findViewById(R.id.spinner_theme);
+            }
 
-        public MyCustomAdapter(Context context,
-                               int itemLayoutId,
-                               ArrayList<Conversation> objects) {
-            super(context, itemLayoutId, objects);
-            layoutId = itemLayoutId;
-            dataConvs = objects;
+            public void bindData(Conversation conversation, Context context) {
+                if (conversation.getActive()) {
+                    spinner_icon.setImageResource(R.drawable.icon36);
+                } else {
+                    spinner_icon.setImageResource(R.drawable.icongray36);
+                }
+                spinner_theme.setText(conversation.getTheme());
+            }
+        }
+
+        public MyAdapter(List<Conversation> modelList, Context context) {
+            dataModelList = modelList;
+            mContext = context;
+        }
+
+        @NonNull
+        @Override
+        public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            // Inflate out card list item
+
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.spinner_item, parent, false);
+            // Return a new view holder
+            view.setOnClickListener(this);
+            return new MyViewHolder(view);
         }
 
         @Override
-        public View getDropDownView(int position, View convertView, ViewGroup parent) {
-            //return getCustomView(position, convertView, parent);
-            LayoutInflater inflater = getLayoutInflater();
-            View item = inflater.inflate(layoutId, parent, false);
-            Conversation nextC = dataConvs.get(position);
+        public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+            // Bind data for the item at position
 
-            TextView label = item.findViewById(R.id.spinner_theme);
-            label.setText(nextC.getTheme());
-
-            ImageView icon = item.findViewById(R.id.spinner_icon);
-
-            if (nextC.getActive()) {
-                icon.setImageResource(R.drawable.icon36);
-            } else {
-                icon.setImageResource(R.drawable.icongray36);
-            }
-
-            return item;
+            holder.bindData(dataModelList.get(position), mContext);
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            //return getCustomView(position, convertView, parent);
-            LayoutInflater inflater = getLayoutInflater();
-            View row = inflater.inflate(layoutId, parent, false);
-            Conversation nextC = dataConvs.get(position);
+        public int getItemCount() {
+            // Return the total number of items
 
-            TextView label = row.findViewById(R.id.spinner_theme);
-            label.setText(nextC.getTheme());
-
-            ImageView icon = row.findViewById(R.id.spinner_icon);
-
-            if (nextC.getActive()) {
-                icon.setImageResource(R.drawable.icon);
-            } else {
-                icon.setImageResource(R.drawable.icongray);
-            }
-
-            return row;
+            return dataModelList.size();
         }
+
+        @Override
+        public void onClick(final View view) {
+            int itemPosition = mRecyclerView.getChildLayoutPosition(view);
+            Conversation convSelected = listeConvs.getList().get(itemPosition);
+
+            gs.alerter("Conv sélectionnée : " + convSelected.getTheme()
+                    + " id=" + convSelected.getId());
+
+            // On crée un Intent pour changer d'activité
+            Intent toShowConv = new Intent(mContext, ShowConvActivity.class);
+            Bundle bdl = new Bundle();
+            bdl.putInt("idConversation",convSelected.getId());
+            toShowConv.putExtras(bdl);
+            startActivity(toShowConv);
+        }
+
+
     }
+
 }

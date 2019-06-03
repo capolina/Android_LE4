@@ -69,6 +69,8 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
     private void loadMessages(JSONObject o) {
         Gson mGson = new Gson();
         Conversation conversation = mGson.fromJson(o.toString(), Conversation.class);
+        TextView titre = findViewById(R.id.conversation_titre);
+        titre.setText(conversation.getTheme());
 
         if (conversation.getMessages().size() > 0) {
             for (Message message : conversation.getMessages()) {

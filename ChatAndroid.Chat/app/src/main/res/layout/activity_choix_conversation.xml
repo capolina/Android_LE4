@@ -1,32 +1,30 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/LinearLayout1"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/orange"
-    android:gravity="center_horizontal|right"
-    android:orientation="vertical">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fitsSystemWindows="true">
 
-    <TextView
-        android:id="@+id/choixConversation_titre"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:text="@string/choixConversation"
-        android:textColor="@color/blanc"
-        android:textSize="12pt" />
+        android:orientation="vertical"
+        android:paddingLeft="24dp"
+        android:paddingTop="56dp"
+        android:paddingRight="24dp">
 
-    <Spinner
-        android:id="@+id/choixConversation_choixConv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/blanc" />
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="24dp"
+            android:text="@string/choixConversation"
+            android:textSize="36sp" />
 
-    <Button
-        android:id="@+id/choixConversation_btnOK"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:enabled="true"
-        android:text="@string/ok" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/choixConversation_choixConv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical"/>
 
-</LinearLayout>
+    </LinearLayout>
+</ScrollView>

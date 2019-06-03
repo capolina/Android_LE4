@@ -7,12 +7,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
+import android.widget.Switch;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.example.chat.Model.Login;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 
 import org.json.JSONException;
@@ -20,9 +20,9 @@ import org.json.JSONObject;
 
 public class LoginActivity extends RestActivity implements View.OnClickListener {
 
-    private EditText champLogin;
-    private EditText champPass;
-    private CheckBox champRemember;
+    private TextInputLayout champLogin;
+    private TextInputLayout champPass;
+    private Switch champRemember;
     private GlobalState gs;
     private Button btnOK;
 
@@ -69,16 +69,16 @@ public class LoginActivity extends RestActivity implements View.OnClickListener 
         if (prefs.getBoolean("remember",true)) {
             String login = prefs.getString("login", "");
             String passe = prefs.getString("passe", "");
-            champLogin.setText(login);
-            champPass.setText(passe);
+            champLogin.getEditText().setText(login);
+            champPass.getEditText().setText(passe);
             champRemember.setChecked(true);
         }
 
     }
 
     private void sendLoginRequest() {
-        String login = champLogin.getText().toString();
-        String pass = champPass.getText().toString();
+        String login = champLogin.getEditText().getText().toString();
+        String pass = champPass.getEditText().getText().toString();
 
         JSONObject request = new JSONObject();
         try {
@@ -143,8 +143,8 @@ public class LoginActivity extends RestActivity implements View.OnClickListener 
 
         if (champRemember.isChecked()) {
             editor.putBoolean("remember", true);
-            editor.putString("login", champLogin.getText().toString());
-            editor.putString("passe", champPass.getText().toString());
+            editor.putString("login", champLogin.getEditText().getText().toString());
+            editor.putString("passe", champPass.getEditText().getText().toString());
         } else {
             editor.putBoolean("remember", false);
             editor.putString("login", "");
