@@ -28,13 +28,13 @@ public abstract class RestActivity extends AppCompatActivity {
     // comment faire pour controler quelle requete se termine ?
     // on passe une seconde chaine à l'appel asynchrone
 
-    public void envoiRequete(String qs, int method, JSONObject request, Response.Listener<JSONObject> onResponse, Response.ErrorListener onErrorResponse) {
+    public void envoiRequete(String qs, String action, int method, JSONObject request) {
         String url = gs.getUrl(qs);
 
         gs.alerter(url);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (method, url, request, onResponse, onErrorResponse)
+                (method, url, request, handleSuccess(action), handleError(action))
         {
             @Override
             public Map<String, String> getHeaders() {
@@ -49,10 +49,6 @@ public abstract class RestActivity extends AppCompatActivity {
         RequestQueueSingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void envoiRequete(String qs, int method, JSONObject request, Response.Listener<JSONObject> onResponse) {
-        envoiRequete(qs, method, request, onResponse, printError());
-    }
-
     public String urlPeriodique() {
         // devrait être abstraite, mais dans ce cas doit être obligatoirement implémentée...
         // On pourrait utiliser une interface ?
@@ -63,7 +59,7 @@ public abstract class RestActivity extends AppCompatActivity {
     // Try AlarmManager running Service
     // http://rmdiscala.developpez.com/cours/LesChapitres.html/Java/Cours3/Chap3.1.htm
     // La requete elle-même sera récupérée grace à l'action demandée dans la méthode urlPeriodique
-    public void requetePeriodique(int periode, final int method, final JSONObject request, final Response.Listener<JSONObject> onResponse, final Response.ErrorListener onErrorResponse) {
+    public void requetePeriodique(int periode, final String action, final int method, final JSONObject request) {
 
         TimerTask doAsynchronousTask;
         final Handler handler = new Handler();
@@ -76,7 +72,7 @@ public abstract class RestActivity extends AppCompatActivity {
 
                 handler.post(new Runnable() {
                     public void run() {
-                        envoiRequete(urlPeriodique(), method, request, onResponse, onErrorResponse);
+                        envoiRequete(urlPeriodique(), action, method, request);
                     }
                 });
 
@@ -86,10 +82,6 @@ public abstract class RestActivity extends AppCompatActivity {
 
         timer.schedule(doAsynchronousTask, 0, 1000 * periode);
 
-    }
-
-    public void requetePeriodique(int periode, final int method, final JSONObject request, final Response.Listener<JSONObject> onResponse) {
-        requetePeriodique(periode, method, request, onResponse, printError());
     }
 
     @Override
@@ -118,13 +110,29 @@ public abstract class RestActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private Response.ErrorListener printError() {
+    public abstract void successCallBack(JSONObject result, String action);
+
+    public void errorCallBack(VolleyError result, String action)
+    {
+        gs.alerter("Error");
+    }
+
+    private Response.Listener<JSONObject> handleSuccess(final String action) {
+        return new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject result) {
+                successCallBack(result, action);
+            }
+        };
+    }
+
+    private Response.ErrorListener handleError(final String action) {
         return new Response.ErrorListener() {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                gs.alerter("Error");
-
+                errorCallBack(error, action);
             }
         };
     }

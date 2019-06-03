@@ -34,7 +34,7 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
         Bundle bdl = getIntent().getExtras();
         idConv = bdl.getInt("idConversation");
 
-        gs.alerter(Integer.toString(idConv));
+        //gs.alerter(Integer.toString(idConv));
 
         // On récupère la liste des messages périodiquement
         // action=getMessages&idConv=<ID>
@@ -43,7 +43,7 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
         // qui permet d'indiquer le dernier message dont on dispose
         // action=getMessages&idConv=<ID>&idLastMessage=<NUMERO>
 
-        requetePeriodique(10, Request.Method.GET, null, loadMessageCallBack());
+        requetePeriodique(10, "recupMessages", Request.Method.GET, null);
         msgLayout = findViewById(R.id.conversation_svLayoutMessages);
 
         btnOK = findViewById(R.id.conversation_btnOK);
@@ -52,6 +52,19 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
         edtMsg = findViewById(R.id.conversation_edtMessage);
 
         idLastMessage = 0;
+    }
+
+    @Override
+    public void successCallBack(JSONObject result, String action)
+    {
+        if(action.contentEquals("recupMessages"))
+        {
+            loadMessages(result);
+        }
+        else if(action.contentEquals("postMessage"))
+        {
+            postMessageCallBack(result);
+        }
     }
 
     private void loadMessages(JSONObject o) {
@@ -75,27 +88,8 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
         msgLayout.addView(tv);
     }
 
-    private Response.Listener<JSONObject> postMessageCallBack() {
-        return new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject result) {
-                gs.alerter("Message posté");
-            }
-        };
-    }
-
-    private Response.Listener<JSONObject> loadMessageCallBack() {
-        return new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject result) {
-                // On a reçu des messages
-                // gs.alerter(o.toString());
-
-                loadMessages(result);
-            }
-        };
+    private void postMessageCallBack(JSONObject result) {
+        gs.alerter("Message posté");
     }
 
     public String urlPeriodique() {
@@ -125,7 +119,7 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
 
 
             String qs = "conversation/" + idConv + "/message";
-            envoiRequete(qs, Request.Method.POST, request, postMessageCallBack());
+            envoiRequete(qs, "postMessage", Request.Method.POST, request);
             edtMsg.setText("");
         }
 

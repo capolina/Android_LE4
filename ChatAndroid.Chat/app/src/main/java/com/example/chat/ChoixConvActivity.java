@@ -37,9 +37,10 @@ public class ChoixConvActivity extends RestActivity implements View.OnClickListe
         // Pour récupérer les conversations
         String qs = "conversation";
 
+        gs.alerter("Chargement des conversations");
         // On se sert des services offerts par RestActivity,
         // qui propose des méthodes d'envoi de requetes asynchrones
-        envoiRequete(qs, Request.Method.GET, null, loadConversationsCallBack());
+        envoiRequete(qs, "recupConversations", Request.Method.GET, null);
 
         listeConvs = new ListeConversations();
 
@@ -50,32 +51,21 @@ public class ChoixConvActivity extends RestActivity implements View.OnClickListe
 
     }
 
+    @Override
+    public void successCallBack(JSONObject result, String action)
+    {
+        if(action.contentEquals("recupConversations"))
+        {
+            chargerConvs(result);
+        }
+    }
+
     private void chargerConvs(JSONObject o) {
-        gs.alerter(o.toString());
-        // On transforme notre objet JSON en une liste de "Conversations"
-        // On pourrait utiliser la librairie GSON pour automatiser ce processus d'interprétation
-        // des objets JSON reçus
-        // Cf. poly de centrale "programmation mobile et réalité augmentée"
-
-        // Ici, on se contente de créer une classe "Conversation" et une classe "ListeConversations"
-        // On parcourt l’objet JSON pour instancier des Conversations, que l’on insère dans la liste
-
-        /*
-         * {"conversations":[
-         *      {"conversationId":1,
-         *          "active":true,
-         *          "theme":"Ma nouvelle conversation",
-         *          "messages":null},
-         *       {"conversationId":2,
-         *          "active":true,
-         *          "theme":"Ma nouvelle conversation 2","messages":null},{"conversationId":3,"active":true,"theme":"Ma nouvelle conversation 2","messages":null},{"conversationId":4,"active":true,"theme":"Ma nouvelle conversation 3","messages":null}]}
-         * */
-
         Gson mGson = new Gson();
 
         listeConvs = mGson.fromJson(o.toString(), ListeConversations.class);
 
-        gs.alerter(listeConvs.toString());
+        //gs.alerter(listeConvs.toString());
 
         // On peut maintenant appuyer sur le bouton
         btnOK.setEnabled(true);
@@ -118,8 +108,7 @@ public class ChoixConvActivity extends RestActivity implements View.OnClickListe
         // On indique que le bouton est désactivé au départ.
 
         Conversation convSelected = (Conversation) sp.getSelectedItem();
-        gs.alerter("Conv sélectionnée : " + convSelected.getTheme()
-                + " id=" + convSelected.getId());
+        gs.alerter("Conv sélectionnée : " + convSelected.getTheme());
 
         // On crée un Intent pour changer d'activité
         Intent toShowConv = new Intent(this, ShowConvActivity.class);
