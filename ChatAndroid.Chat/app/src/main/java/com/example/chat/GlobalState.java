@@ -81,33 +81,6 @@ public class GlobalState extends Application {
         e.apply();
     }
 
-    public String requete(String qs) {
-        if (qs != null)
-        {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            String urlData = prefs.getString("urlData","http://10.0.2.2/android_chat/data.php");
-
-            try {
-                URL url = new URL(urlData + "?" + qs);
-                Log.i(CAT,"url utilisée : " + url.toString());
-                HttpURLConnection urlConnection = null;
-                urlConnection = (HttpURLConnection) url.openConnection();
-                InputStream in = null;
-                in = new BufferedInputStream(urlConnection.getInputStream());
-                String txtReponse = convertStreamToString(in);
-                urlConnection.disconnect();
-                return txtReponse;
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
-
-        return "";
-    }
-
     public boolean verifReseau()
     {
         // On vérifie si le réseau est disponible,

@@ -30,11 +30,6 @@ public class Conversation {
     public Conversation() {
         this.messages = new ArrayList<>();
     }
-    public Conversation(int id, String theme, Boolean active) {
-        this.id = id;
-        this.theme = theme;
-        this.active = active;
-    }
 
     @Override
     public String toString() {

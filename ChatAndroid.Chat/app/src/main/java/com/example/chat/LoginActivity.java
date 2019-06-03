@@ -20,11 +20,11 @@ import org.json.JSONObject;
 
 public class LoginActivity extends RestActivity implements View.OnClickListener {
 
-    EditText champLogin;
-    EditText champPass;
-    CheckBox champRemember;
-    GlobalState gs;
-    Button btnOK;
+    private EditText champLogin;
+    private EditText champPass;
+    private CheckBox champRemember;
+    private GlobalState gs;
+    private Button btnOK;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

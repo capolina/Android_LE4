@@ -46,7 +46,7 @@ public class ChoixConvActivity extends RestActivity implements View.OnClickListe
         btnOK = findViewById(R.id.choixConversation_btnOK);
         btnOK.setOnClickListener(this);
 
-        sp = (Spinner) findViewById(R.id.choixConversation_choixConv);
+        sp = findViewById(R.id.choixConversation_choixConv);
 
     }
 
@@ -100,7 +100,7 @@ public class ChoixConvActivity extends RestActivity implements View.OnClickListe
         // V2 : Utilisation d'un adapteur customisé qui permet de définir nous-même
         // la forme des éléments à afficher
 
-        Spinner sp = (Spinner) findViewById(R.id.choixConversation_choixConv);
+        Spinner sp = findViewById(R.id.choixConversation_choixConv);
 
         sp.setAdapter(new MyCustomAdapter(this,
                 R.layout.spinner_item,
@@ -149,10 +149,10 @@ public class ChoixConvActivity extends RestActivity implements View.OnClickListe
             View item = inflater.inflate(layoutId, parent, false);
             Conversation nextC = dataConvs.get(position);
 
-            TextView label = (TextView) item.findViewById(R.id.spinner_theme);
+            TextView label = item.findViewById(R.id.spinner_theme);
             label.setText(nextC.getTheme());
 
-            ImageView icon = (ImageView) item.findViewById(R.id.spinner_icon);
+            ImageView icon = item.findViewById(R.id.spinner_icon);
 
             if (nextC.getActive()) {
                 icon.setImageResource(R.drawable.icon36);
@@ -170,10 +170,10 @@ public class ChoixConvActivity extends RestActivity implements View.OnClickListe
             View row = inflater.inflate(layoutId, parent, false);
             Conversation nextC = dataConvs.get(position);
 
-            TextView label = (TextView) row.findViewById(R.id.spinner_theme);
+            TextView label = row.findViewById(R.id.spinner_theme);
             label.setText(nextC.getTheme());
 
-            ImageView icon = (ImageView) row.findViewById(R.id.spinner_icon);
+            ImageView icon = row.findViewById(R.id.spinner_icon);
 
             if (nextC.getActive()) {
                 icon.setImageResource(R.drawable.icon);
