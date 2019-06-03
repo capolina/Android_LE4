@@ -9,7 +9,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.volley.Request;
-import com.android.volley.Response;
 import com.example.chat.Model.Conversation;
 import com.example.chat.Model.Message;
 import com.google.gson.Gson;
@@ -43,7 +42,7 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
         // qui permet d'indiquer le dernier message dont on dispose
         // action=getMessages&idConv=<ID>&idLastMessage=<NUMERO>
 
-        requetePeriodique(10, "recupMessages", Request.Method.GET, null);
+        requetePeriodique(5, "recupMessages", Request.Method.GET, null);
         msgLayout = findViewById(R.id.conversation_svLayoutMessages);
 
         btnOK = findViewById(R.id.conversation_btnOK);
@@ -90,15 +89,24 @@ public class ShowConvActivity extends RestActivity implements View.OnClickListen
 
     private void postMessageCallBack() {
         gs.alerter("Message posté");
+        sendLoadMessageRequest();
     }
 
-    public String urlPeriodique() {
-        String qs = "";
+    public String urlPeriodique(String action) {
+        if( action.contentEquals("recupMessages")) {
+            String qs = "";
 
-        qs = "conversation/" + idConv;
-        qs += "?idLastMessage=" + idLastMessage;
+            qs = "conversation/" + idConv;
+            qs += "?idLastMessage=" + idLastMessage;
 
-        return qs;
+            return qs;
+        }
+        return "";
+    }
+
+    private void sendLoadMessageRequest() {
+        String qs = urlPeriodique("recupMessages");
+        envoiRequete(qs, "recupMessages", Request.Method.GET, null);
     }
 
     @Override

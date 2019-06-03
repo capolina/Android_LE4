@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -23,6 +24,8 @@ public abstract class RestActivity extends AppCompatActivity {
 
     protected GlobalState gs;
 
+    protected Timer timer = new Timer();
+
     // Une classe capable de faire des requêtes simplement
     // Si elle doit faire plusieurs requetes,
     // comment faire pour controler quelle requete se termine ?
@@ -31,7 +34,8 @@ public abstract class RestActivity extends AppCompatActivity {
     public void envoiRequete(String qs, String action, int method, JSONObject request) {
         String url = gs.getUrl(qs);
 
-        gs.alerter(url);
+        //gs.alerter(url);
+        Log.i(gs.CAT, "Request sent to " + url);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (method, url, request, handleSuccess(action), handleError(action))
@@ -49,7 +53,7 @@ public abstract class RestActivity extends AppCompatActivity {
         RequestQueueSingleton.getInstance(this.getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
-    public String urlPeriodique() {
+    public String urlPeriodique(String action) {
         // devrait être abstraite, mais dans ce cas doit être obligatoirement implémentée...
         // On pourrait utiliser une interface ?
         return "";
@@ -63,7 +67,6 @@ public abstract class RestActivity extends AppCompatActivity {
 
         TimerTask doAsynchronousTask;
         final Handler handler = new Handler();
-        Timer timer = new Timer();
 
         doAsynchronousTask = new TimerTask() {
 
@@ -72,7 +75,7 @@ public abstract class RestActivity extends AppCompatActivity {
 
                 handler.post(new Runnable() {
                     public void run() {
-                        envoiRequete(urlPeriodique(), action, method, request);
+                        envoiRequete(urlPeriodique(action), action, method, request);
                     }
                 });
 
@@ -108,6 +111,13 @@ public abstract class RestActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        timer.cancel();
     }
 
     public abstract void successCallBack(JSONObject result, String action);
